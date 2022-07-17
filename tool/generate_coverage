@@ -1,0 +1,3 @@
+#!/bin/bash
+tool/dart_coverage
+open coverage/index.html
