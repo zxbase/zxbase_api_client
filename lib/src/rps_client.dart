@@ -1,12 +1,25 @@
+// Copyright (C) 2022 Zxbase, LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 /// RPS (Registration and pairing service) client.
 
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:zxbase_crypto/zxbase_crypto.dart';
 import 'package:zxbase_model/zxbase_model.dart';
-
+import 'package:zxbase_api_client/src/motd.dart';
 import 'package:http/http.dart' as http;
 
 class RpsClient {
@@ -14,10 +27,10 @@ class RpsClient {
   static const _proto = 'https';
 
   final _zxbClient = http.Client();
+  get httpClient => _zxbClient;
 
   late String _host;
   late int _port;
-
   late Identity _identity;
   late SimpleKeyPair _keyPair;
 
@@ -30,14 +43,13 @@ class RpsClient {
     'Content-Type': 'application/json; charset=UTF-8'
   };
 
-  get httpClient => _zxbClient;
-
   /// Initialize client.
-  void init(
-      {required String host,
-      int port = 7070,
-      required Identity identity,
-      required SimpleKeyPair keyPair}) {
+  void init({
+    required String host,
+    int port = 7070,
+    required Identity identity,
+    required SimpleKeyPair keyPair,
+  }) {
     _host = host;
     _port = port;
     _identity = identity;
@@ -106,17 +118,13 @@ class RpsClient {
     }
   }
 
-  /// Pair device with a peer.
-  /// Returns true if a mutual trust was established as a result of this
-  /// pairing.
-  ///  Mutual trust requires both peers to express their consent.
+  /// Pair device with a peer. Returns true if a mutual trust was established.
   Future<bool> pair({required String peerIdentity}) async {
     try {
       final params = jsonEncode({'peerIdentity': peerIdentity});
       final url = Uri.parse(
           '$_proto://$_host:$_port/devices/${_identity.deviceId}/peers');
       final res = await _zxbClient.post(url, headers: headers, body: params);
-
       if (res.statusCode == 200) {
         Map<String, dynamic> body = jsonDecode(res.body);
         return body['paired'];
@@ -152,7 +160,6 @@ class RpsClient {
       final url = Uri.parse('$_proto://$_host:$_port/channels');
       final params = jsonEncode({'peerId': peerId, 'app': app});
       final res = await _zxbClient.post(url, headers: headers, body: params);
-
       if (res.statusCode == 200) {
         Map<String, dynamic> body = jsonDecode(res.body);
         return body['channelId'];
@@ -162,6 +169,27 @@ class RpsClient {
     } catch (e) {
       log('Failed to get channel.', name: component, error: e);
       return '';
+    }
+  }
+
+  Future<MOTD?> getMotd() async {
+    try {
+      var url = Uri.parse('$_proto://$_host:$_port/motd?current=true');
+      var res = await _zxbClient.get(url, headers: headers);
+
+      if (res.statusCode == 200) {
+        Map<String, dynamic> body = jsonDecode(res.body);
+        if (body['motd']!.isEmpty) {
+          return null;
+        }
+        return MOTD.fromJson(body['motd']![0]);
+      }
+
+      log('MOTD error.', name: component, error: res.body);
+      return null;
+    } catch (e) {
+      log('MOTD failed.', name: component, error: e);
+      return null;
     }
   }
 }

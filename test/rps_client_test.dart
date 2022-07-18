@@ -1,3 +1,17 @@
+// Copyright (C) 2022 Zxbase, LLC. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 import 'package:zxbase_api_client/zxbase_api_client.dart';
 import 'package:zxbase_crypto/zxbase_crypto.dart';
 import 'package:zxbase_model/zxbase_model.dart';
@@ -138,5 +152,25 @@ void main() {
         await rpsClient.channel(peerId: idnt2.deviceId, app: 'vault');
     Uuid.parse(result);
     expect(result, isNot(equals('')));
+  }, timeout: const Timeout(Duration(minutes: 2)));
+
+  test('Get MOTD', () async {
+    MOTD dummyMOTD = MOTD(
+        id: 1,
+        message: 'Message',
+        notes: 'Notes',
+        date: DateTime.now().toUtc());
+    expect(dummyMOTD.id, equals(1));
+
+    MOTD anotherMOTD = MOTD.fromJson({
+      'id': 1,
+      'message': 'Message',
+      'notes': 'Notes',
+      'date': DateTime.now().toUtc().toIso8601String()
+    });
+    expect(anotherMOTD.id, equals(1));
+
+    var rv = await rpsClient.getMotd();
+    expect(rv, isNot(equals(null)));
   }, timeout: const Timeout(Duration(minutes: 2)));
 }

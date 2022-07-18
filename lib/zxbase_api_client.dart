@@ -15,4 +15,5 @@
 library zxbase_api_client;
 
 export 'src/const.dart';
+export 'src/motd.dart';
 export 'src/rps_client.dart';

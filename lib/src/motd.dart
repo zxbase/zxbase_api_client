@@ -12,5 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const defaultTopic = 'default';
-const registrationTopic = 'registration';
+/// Message of the day.
+
+class MOTD {
+  MOTD(
+      {required this.id,
+      required this.message,
+      required this.notes,
+      required this.date});
+
+  MOTD.fromJson(Map<String, dynamic> parsedJson) {
+    id = parsedJson['id'];
+    message = parsedJson['message'];
+    notes = parsedJson['notes'];
+    date = DateTime.parse(parsedJson['date']);
+  }
+
+  late int id;
+  late String message;
+  late String notes;
+  late DateTime date;
+}
