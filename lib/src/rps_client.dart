@@ -26,8 +26,7 @@ class RpsClient {
   static const component = 'RpsClient'; // logging component
   static const _proto = 'https';
 
-  final _zxbClient = http.Client();
-  get httpClient => _zxbClient;
+  late http.Client httpClient;
 
   late String _host;
   late int _port;
@@ -54,6 +53,7 @@ class RpsClient {
     _port = port;
     _identity = identity;
     _keyPair = keyPair;
+    httpClient = http.Client();
   }
 
   /// Obtain token to access the service anonymously.
@@ -65,7 +65,7 @@ class RpsClient {
 
     final url = Uri.parse('$_proto://$_host:$_port/auth');
     http.Response res =
-        await _zxbClient.post(url, headers: headers, body: postParams);
+        await httpClient.post(url, headers: headers, body: postParams);
     if (res.statusCode != 200) {
       log('Failed to get challenge: ${res.body}.', name: component);
       return false;
@@ -85,7 +85,7 @@ class RpsClient {
       'access': {'tier': 1, 'topic': topic}
     });
 
-    res = await _zxbClient.put(url, headers: headers, body: putParams);
+    res = await httpClient.put(url, headers: headers, body: putParams);
     if (res.statusCode != 200) {
       log('Failed to obtain token: ${res.body}.', name: component);
       return false;
@@ -106,7 +106,7 @@ class RpsClient {
       final params = jsonEncode({'metadata': metadata});
       final url =
           Uri.parse('$_proto://$_host:$_port/devices/${_identity.deviceId}');
-      final res = await _zxbClient.post(url, headers: headers, body: params);
+      final res = await httpClient.post(url, headers: headers, body: params);
       if (res.statusCode == 200) {
         log('Device registration succeeded.', name: component);
         return true;
@@ -124,7 +124,7 @@ class RpsClient {
       final params = jsonEncode({'peerIdentity': peerIdentity});
       final url = Uri.parse(
           '$_proto://$_host:$_port/devices/${_identity.deviceId}/peers');
-      final res = await _zxbClient.post(url, headers: headers, body: params);
+      final res = await httpClient.post(url, headers: headers, body: params);
       if (res.statusCode == 200) {
         Map<String, dynamic> body = jsonDecode(res.body);
         return body['paired'];
@@ -142,7 +142,7 @@ class RpsClient {
     try {
       final url = Uri.parse(
           '$_proto://$_host:$_port/devices/${_identity.deviceId}/peers');
-      final res = await _zxbClient.get(url, headers: headers);
+      final res = await httpClient.get(url, headers: headers);
       if (res.statusCode == 200) {
         return jsonDecode(res.body);
       }
@@ -159,7 +159,7 @@ class RpsClient {
     try {
       final url = Uri.parse('$_proto://$_host:$_port/channels');
       final params = jsonEncode({'peerId': peerId, 'app': app});
-      final res = await _zxbClient.post(url, headers: headers, body: params);
+      final res = await httpClient.post(url, headers: headers, body: params);
       if (res.statusCode == 200) {
         Map<String, dynamic> body = jsonDecode(res.body);
         return body['channelId'];
@@ -175,7 +175,7 @@ class RpsClient {
   Future<MOTD?> getMotd() async {
     try {
       var url = Uri.parse('$_proto://$_host:$_port/motd?current=true');
-      var res = await _zxbClient.get(url, headers: headers);
+      var res = await httpClient.get(url, headers: headers);
 
       if (res.statusCode == 200) {
         Map<String, dynamic> body = jsonDecode(res.body);
@@ -184,7 +184,6 @@ class RpsClient {
         }
         return MOTD.fromJson(body['motd']![0]);
       }
-
       log('MOTD error.', name: component, error: res.body);
       return null;
     } catch (e) {

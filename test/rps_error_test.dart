@@ -12,11 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'dart:convert';
 import 'package:zxbase_api_client/zxbase_api_client.dart';
 import 'package:zxbase_crypto/zxbase_crypto.dart';
 import 'package:zxbase_model/zxbase_model.dart';
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+
+final challenge = {
+  'challenge': {
+    'msg':
+        '1:12:1658174941021:501820f1-8e2f-436c-b987-66a78482aa26:eyJrdHkiOiJPS1AiLCJjcnYiOiJFZDI1NTE5IiwieCI6Imt0d3RodXJFTW50cXF0Z2VfZEVjYWs4N3hIUmdYdnVGZkc4SUt0OFJYdUk9Iiwia2lkIjoiOGI4ZjI2YjctZGZjNS00ZDI3LWEzYmMtY2M3ZjBiMTg2ODBhIiwidmVyIjoxfQ==:Q47C5KizCohQ2kmO2SOdqehiL58BpzmBXwDDbEJDjtY%3D',
+    'sig':
+        'tvQusAJd58T%2FgXPgni5pZc6jdAqMXh6ocBO4P4Bex5lyKCu%2BgCa0rBlOd1APTJ6ncxC2R%2FEru9nyZ9wQHh4aoXzg0IgyKt7MXFBXWKYuopPMC7w2G%2BAKO6iWkA%2BqLRJnDLtPk6BVGmetTeQl2PTTdmIGSbC94I%2Bt2L6Hy1dGNrQHt0%2FhPf9FvVLrXTDjUAx9BTvpuYEQCBFsOM8YrGC%2FrQgThPdHOOAptG0cOeiF74gyX9t8X8TCah3O07%2FVEPlfDIYjIm8Ch3YPbG1uzGGN8IPmvjDsEacxDmzkBp9F%2FK4%2FwM6GEn1HWOGEw3F9qBBr9qTNgB5w1U02nwsbhjRPQQ%3D%3D',
+    'x5c': 'x5c'
+  }
+};
 
 void main() {
   const host = 'alpha.zxbase.com';
@@ -34,21 +47,25 @@ void main() {
   late SimpleKeyPair kp2;
   late SimplePublicKey pubK2;
   late Identity idnt2;
-  RpsClient rpsClient2 = RpsClient();
 
   setUpAll(() async {
     kp = await PKCrypto.generateKeyPair();
     pubK = await kp.extractPublicKey();
     me = Identity(deviceId: deviceId, publicKey: pubK);
     rpsClient.init(host: host, identity: me, keyPair: kp);
+    rpsClient.httpClient = MockClient((request) async {
+      if (request.url.toString().contains('auth') && request.method == 'POST') {
+        return http.Response(jsonEncode(challenge), 200);
+      }
+      return http.Response('bla', 409);
+    });
 
     kp2 = await PKCrypto.generateKeyPair();
     pubK2 = await kp2.extractPublicKey();
     idnt2 = Identity(deviceId: deviceId2, publicKey: pubK2);
-    rpsClient2.init(host: host, identity: idnt2, keyPair: kp2);
   });
 
-  test('Registration response is not 200', () async {
+  test('Registration put response is not 200', () async {
     final result = await rpsClient.obtainToken(topic: 'bla');
     expect(result, equals(false));
   }, timeout: const Timeout(Duration(minutes: 2)));
@@ -64,13 +81,26 @@ void main() {
     expect(result, equals(''));
   }, timeout: const Timeout(Duration(minutes: 2)));
 
-  test('Get peers response is not 200', () async {
+  test('Peers response is not 200', () async {
     final result = await rpsClient.getPeers();
     expect(result, equals([]));
   }, timeout: const Timeout(Duration(minutes: 2)));
 
   test('Register response is not 200', () async {
     final result = await rpsClient.register(metadata: metadata);
+    expect(result, equals(false));
+  }, timeout: const Timeout(Duration(minutes: 2)));
+
+  test('Pairing response is not 200', () async {
+    final result = await rpsClient.pair(peerIdentity: idnt2.toBase64Url());
+    expect(result, equals(false));
+  }, timeout: const Timeout(Duration(minutes: 2)));
+
+  test('Registration post response is not 200', () async {
+    rpsClient.httpClient = MockClient((request) async {
+      return http.Response('bla', 409);
+    });
+    final result = await rpsClient.obtainToken(topic: 'bla');
     expect(result, equals(false));
   }, timeout: const Timeout(Duration(minutes: 2)));
 }
