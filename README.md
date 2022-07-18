@@ -12,6 +12,7 @@ Zxbase Dart API client.
   - Pairing.
   - Obtaining peers.
   - Obtaining channels.
+  - MOTD.
 
 ## Getting started
 In _pubspec.yaml_:
