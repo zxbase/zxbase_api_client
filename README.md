@@ -28,4 +28,4 @@ import 'package:zxbase_api_client/zxbase_api_client.dart';
 ## Usage
 
 Check examples in test files:
-  - TBD.
+  - test/rps_client_test.dart
