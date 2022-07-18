@@ -56,13 +56,7 @@ void main() {
     rpsClient2.init(host: host, identity: idnt2, keyPair: kp2);
   });
 
-  test('Registration fails with wrong topic', () async {
-    final result = await rpsClient.obtainToken(topic: 'bla');
-    expect(result, equals(false));
-  }, timeout: const Timeout(Duration(minutes: 2)));
-
   test('Acquire registration token', () async {
-    expect(rpsClient.httpClient != null, true);
     httpClient = rpsClient.httpClient;
     final result = await rpsClient.obtainToken(topic: registrationTopic);
     expect(result, equals(true));
