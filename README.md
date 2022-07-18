@@ -7,7 +7,11 @@ Zxbase Dart API client.
 
 ## Features
 
-- TBD
+- Registration and pairing functionality:
+  - Registration.
+  - Pairing.
+  - Obtaining peers.
+  - Obtaining channels.
 
 ## Getting started
 In _pubspec.yaml_:

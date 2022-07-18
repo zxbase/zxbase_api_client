@@ -1,3 +1,7 @@
 ## 1.0.0
 
-- TBD
+- Registration and pairing functionality:
+  - Registration.
+  - Pairing.
+  - Obtaining peers.
+  - Obtaining channels.
