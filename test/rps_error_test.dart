@@ -13,13 +13,13 @@
 // limitations under the License.
 
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:test/test.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zxbase_api_client/zxbase_api_client.dart';
 import 'package:zxbase_crypto/zxbase_crypto.dart';
 import 'package:zxbase_model/zxbase_model.dart';
-import 'package:test/test.dart';
-import 'package:uuid/uuid.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/testing.dart';
 
 final challenge = {
   'challenge': {

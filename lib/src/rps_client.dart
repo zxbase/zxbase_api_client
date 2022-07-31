@@ -17,10 +17,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:zxbase_api_client/src/motd.dart';
 import 'package:zxbase_crypto/zxbase_crypto.dart';
 import 'package:zxbase_model/zxbase_model.dart';
-import 'package:zxbase_api_client/src/motd.dart';
-import 'package:http/http.dart' as http;
 
 class RpsClient {
   static const component = 'RpsClient'; // logging component
@@ -179,9 +179,11 @@ class RpsClient {
 
       if (res.statusCode == 200) {
         Map<String, dynamic> body = jsonDecode(res.body);
+        // ignore: avoid_dynamic_calls
         if (body['motd']!.isEmpty) {
           return null;
         }
+        // ignore: avoid_dynamic_calls
         return MOTD.fromJson(body['motd']![0]);
       }
       log('MOTD error.', name: component, error: res.body);

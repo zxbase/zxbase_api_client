@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'package:zxbase_api_client/zxbase_api_client.dart';
-import 'package:zxbase_crypto/zxbase_crypto.dart';
-import 'package:zxbase_model/zxbase_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zxbase_api_client/zxbase_api_client.dart';
+import 'package:zxbase_crypto/zxbase_crypto.dart';
+import 'package:zxbase_model/zxbase_model.dart';
 
 void main() {
   const host = 'alpha.zxbase.com';
