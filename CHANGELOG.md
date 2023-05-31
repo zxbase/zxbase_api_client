@@ -1,3 +1,8 @@
+## 1.1.1
+
+- Upgrade http package.
+- Flutter 3.10.+ and Dart 3 support.
+
 ## 1.1.0
 
 - MOTD API.
