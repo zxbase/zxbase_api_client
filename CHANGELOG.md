@@ -1,3 +1,7 @@
+## 1.1.2
+
+- Update UUID version to 4.0.0.
+
 ## 1.1.1
 
 - Upgrade http package.
