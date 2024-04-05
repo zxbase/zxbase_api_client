@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// Message of the day.
+// Message of the day.
 
 class MOTD {
   MOTD(
