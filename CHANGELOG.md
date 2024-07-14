@@ -1,3 +1,6 @@
+## 1.1.4
+- Update lints version to 4.0.0
+
 ## 1.1.3
 - Update lints version to 3.0.0
 
