@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-library zxbase_api_client;
-
 export 'src/const.dart';
 export 'src/motd.dart';
 export 'src/rps_client.dart';
